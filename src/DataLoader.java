@@ -1,4 +1,12 @@
-
+package com.machinelearning.PA2;
+/*
+ * Authors : Aniket Bhosale and Mayur Tare
+ * 
+ * Description :
+ * Class to read a CSV file and store the data set
+ * into a ArrayList of a ArrayList of Strings.
+ * First element is a List of names of Features.
+ */
 
 
 import java.io.BufferedReader;
@@ -12,9 +20,10 @@ public class DataLoader {
 	public static int numberOfFeatures;
     public static ArrayList<String> labels = new ArrayList<String>();
     public static ArrayList<Integer> catFeatures = new ArrayList<Integer>();
-    public static ArrayList<ArrayList<String>> readRecords(String FILE_PATH){
+    
+    public static ArrayList<Example> readRecords(String FILE_PATH){
 		BufferedReader reader = null;
-		ArrayList<ArrayList<String>> records = new ArrayList<ArrayList<String>>();
+		ArrayList<Example> records = new ArrayList<Example>();
 
         try { 
            File f = new File(FILE_PATH);
@@ -24,7 +33,7 @@ public class DataLoader {
            String line;
            String currLable;
            String currFeature;
-           ArrayList<String> r = null;
+           Example ex = null;
            
            //Read first record from the files as Name of lables 
            line = reader.readLine();
@@ -39,15 +48,15 @@ public class DataLoader {
            //Read all records
            while ((line = reader.readLine()) != null) {
                st = new StringTokenizer(line, ",");
-               r = new ArrayList<String>();
+               ex = new Example();
                for(int i = 0; i<numberOfFeatures; i++){
             	   currFeature = st.nextToken();
             	   //Find all categorical features
             	   if(Integer.parseInt(currFeature)>1 && !catFeatures.contains(i))
             		   catFeatures.add(i);
-            	   r.add(currFeature);
+            	   ex.features.add(currFeature);
                }
-               records.add(r);
+               records.add(ex);
            }
            reader.close();
         }
