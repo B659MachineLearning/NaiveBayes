@@ -1,4 +1,4 @@
-package com.machinelearning.PA2;
+package com.machinelearning.NaiveBayes;
 
 import java.beans.FeatureDescriptor;
 import java.util.ArrayList;

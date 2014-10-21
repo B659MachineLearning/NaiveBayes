@@ -1,3 +1,4 @@
+package com.machinelearning.NaiveBayes;
 
 
 /*
