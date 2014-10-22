@@ -17,15 +17,15 @@ public class NaiveBayes {
 		System.out.println("Examples =" + examples.size());
 		System.out.println("Features : "+DataLoader.featurePossVals);
 		
-		//Data Struvture to store the counts for features
+		//Data Structure to store the counts for features
 		HashMap<Integer, HashMap<String, Integer>> trueCounts = new HashMap<Integer, HashMap<String, Integer>>();
 		HashMap<Integer, HashMap<String, Integer>> falseCounts = new HashMap<Integer, HashMap<String, Integer>>();
 		
-		//Index of the class lable
+		//Index of the class label
 		String lable = Config.readConfig("classLable");
 		int lableIndex = DataLoader.labels.indexOf(lable);
 		
-		//Assume class lable "1" to be true and rest to be false
+		//Assume class label "1" to be true and rest to be false
 		String trueClassLable = "1";
 		
 		int trueLableExamples = 0;
@@ -55,7 +55,7 @@ public class NaiveBayes {
 					}					
 				}
 			}
-			//Count for false class lable
+			//Count for false class label
 			else{
 				for(int i = 0; i < DataLoader.numberOfFeatures; i++){
 					currVal = ex.features.get(i);
@@ -114,8 +114,9 @@ public class NaiveBayes {
 					//System.out.println("FFFFFF : "+i+" "+testEx.getFeature(i));
 					falseProb *= (double)(featureFalseCount + laplaceCorrection)/(falseLableExamples + numberOfPossVals);
 					
-					//System.out.println("true prob : "+trueProb);//featureTrueCount+"+"+ laplaceCorrection+"/"+trueLableExamples+"+"+numberOfPossVals);
-					//System.out.println("true prob : "+falseProb);//featureFalseCount+"+"+ laplaceCorrection+"/"+falseLableExamples+"+"+numberOfPossVals);
+					System.out.println("true prob for feature "+DataLoader.labels.get(i)+"  : "+trueProb);
+					System.out.println("false prob for feature "+DataLoader.labels.get(i)+" : "+falseProb);
+					System.out.println("--------------------------------------");
 				}
 			}
 			//System.out.println("true prob : "+trueProb);
@@ -143,16 +144,6 @@ public class NaiveBayes {
 		}
 		
 		System.out.println(wrongPredctionCount+" Incorrect Predictions for "+testExamples.size()+" test examples");
-		
-		//DEBUG
-		/*for (int i =0; i<examples.size();i++){
-			for (int j =0; j<DataLoader.numberOfFeatures;j++){
-				
-				System.out.print(examples.get(i).getFeature(j));
-				
-			}
-			System.out.println();
-		}*/
 	}
 
 }
