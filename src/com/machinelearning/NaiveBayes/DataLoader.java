@@ -4,12 +4,11 @@ package com.machinelearning.NaiveBayes;
  * 
  * Description :
  * Class to read a CSV file and store the data set
- * into a ArrayList of a ArrayList of Strings.
+ * into a ArrayList of a Example POJOs.
  * First element is a List of names of Features.
  */
 
 
-import java.awt.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

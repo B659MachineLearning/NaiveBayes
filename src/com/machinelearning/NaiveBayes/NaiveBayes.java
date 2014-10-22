@@ -12,19 +12,28 @@ public class NaiveBayes {
 		String trainFilePath = Config.readConfig("trainFileName");
 		String testFilePath = Config.readConfig("testFileName");
 		
+		//Read Training Examples from Dataset file
 		ArrayList<Example> examples = DataLoader.readRecords(trainFilePath);
 		System.out.println("Examples =" + examples.size());
 		System.out.println("Features : "+DataLoader.featurePossVals);
 		
+		//Data Struvture to store the counts for features
 		HashMap<Integer, HashMap<String, Integer>> trueCounts = new HashMap<Integer, HashMap<String, Integer>>();
 		HashMap<Integer, HashMap<String, Integer>> falseCounts = new HashMap<Integer, HashMap<String, Integer>>();
 		
+		//Index of the class lable
+		String lable = Config.readConfig("classLable");
+		int lableIndex = DataLoader.labels.indexOf(lable);
 		
-		int lableIndex = DataLoader.labels.indexOf("type");
+		//Assume class lable "1" to be true and rest to be false
 		String trueClassLable = "1";
+		
 		int trueLableExamples = 0;
 		String currVal = null;
+		
+		//Iterate over all training examples and learn.
 		for(Example ex : examples){
+			//Count for true class lable
 			if(ex.features.get(lableIndex).equalsIgnoreCase(trueClassLable)){
 				trueLableExamples++;
 				for(int i = 0; i < DataLoader.numberOfFeatures; i++){
@@ -46,6 +55,7 @@ public class NaiveBayes {
 					}					
 				}
 			}
+			//Count for false class lable
 			else{
 				for(int i = 0; i < DataLoader.numberOfFeatures; i++){
 					currVal = ex.features.get(i);
@@ -68,24 +78,27 @@ public class NaiveBayes {
 			}
 		}
 		//Total number of False lable Examples
-		int falseLableExamples = examples.size() - trueLableExamples;	
+		int falseLableExamples = examples.size() - trueLableExamples;
+		
+		//Possible class lables
 		int possClassLables = 2;
 		
-		System.out.println("True HashMap : "+trueCounts.toString());
-		System.out.println("False HashMap : "+falseCounts.toString());
+		//System.out.println("True HashMap : "+trueCounts.toString());
+		//System.out.println("False HashMap : "+falseCounts.toString());
 		
-		//Classify
+		//Classify the test data
+		//Read Test examples from Test Dataset
 		ArrayList<Example> testExamples = DataLoader.readRecords(testFilePath);
 		System.out.println("Test Examples =" + testExamples.size());
 		
-		int correctPredctionCount = 0;
 		int wrongPredctionCount = 0;
+		int laplaceCorrection = 1;
 		
 		for(Example testEx : testExamples){
 			String observedLable = testEx.getFeature(lableIndex);
 			
-			double trueClassPrior = (double)(trueLableExamples + 1) / (trueLableExamples + falseLableExamples + possClassLables);
-			double falseClassPrior = (double)(falseLableExamples + 1) / (trueLableExamples + falseLableExamples + possClassLables);
+			double trueClassPrior = (double)(trueLableExamples + laplaceCorrection) / (trueLableExamples + falseLableExamples + possClassLables);
+			double falseClassPrior = (double)(falseLableExamples + laplaceCorrection) / (trueLableExamples + falseLableExamples + possClassLables);
 			double trueProb = 1.0 * trueClassPrior;
 			double falseProb = 1.0 * falseClassPrior;
 			
@@ -97,15 +110,18 @@ public class NaiveBayes {
 					int featureTrueCount = trueCounts.get(i).get(featureVal) != null ? trueCounts.get(i).get(featureVal) : 0;
 					int featureFalseCount = falseCounts.get(i).get(featureVal) != null ? falseCounts.get(i).get(featureVal) : 0;
 					
-					trueProb *= (double)(featureTrueCount + 1)/(trueLableExamples + numberOfPossVals);
+					trueProb *= (double)(featureTrueCount + laplaceCorrection)/(trueLableExamples + numberOfPossVals);
 					//System.out.println("FFFFFF : "+i+" "+testEx.getFeature(i));
-					falseProb *= (double)(featureFalseCount + 1)/(falseLableExamples + numberOfPossVals);
+					falseProb *= (double)(featureFalseCount + laplaceCorrection)/(falseLableExamples + numberOfPossVals);
 					
-					System.out.println("true prob : "+(featureTrueCount + 1)+"/"+trueLableExamples+"+"+numberOfPossVals);
-					System.out.println("true prob : "+(featureFalseCount + 1)+"/"+falseLableExamples+"+"+numberOfPossVals);
+					//System.out.println("true prob : "+trueProb);//featureTrueCount+"+"+ laplaceCorrection+"/"+trueLableExamples+"+"+numberOfPossVals);
+					//System.out.println("true prob : "+falseProb);//featureFalseCount+"+"+ laplaceCorrection+"/"+falseLableExamples+"+"+numberOfPossVals);
 				}
-			}			
-			System.out.println("=========================");
+			}
+			//System.out.println("true prob : "+trueProb);
+			//System.out.println("false prob : "+falseProb);
+			
+			//System.out.println("=========================");
 			
 			double normTrueProb = trueProb / (trueProb + falseProb);
 			double normFalseProb = falseProb / (trueProb + falseProb);
@@ -115,19 +131,18 @@ public class NaiveBayes {
 			if(observedLable.equalsIgnoreCase("1")){
 				if(!prediction.equalsIgnoreCase("T")){
 					wrongPredctionCount++;
+					System.out.println("Wrong prediction for Test Example : "+testEx.features.toString());
 				}
 			}
 			else{
 				if(prediction.equalsIgnoreCase("T")){
 					wrongPredctionCount++;
+					System.out.println("Wrong prediction for Test Example : "+testEx.features.toString());
 				}
 			}
 		}
 		
 		System.out.println(wrongPredctionCount+" Incorrect Predictions for "+testExamples.size()+" test examples");
-		
-		//for(int i = 0; i<)
-		
 		
 		//DEBUG
 		/*for (int i =0; i<examples.size();i++){
