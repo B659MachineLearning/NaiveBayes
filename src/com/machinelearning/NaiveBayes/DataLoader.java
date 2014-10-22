@@ -9,6 +9,7 @@ package com.machinelearning.NaiveBayes;
  */
 
 
+import java.awt.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +21,7 @@ public class DataLoader {
 	public static int numberOfFeatures;
     public static ArrayList<String> labels = new ArrayList<String>();
     public static ArrayList<Integer> catFeatures = new ArrayList<Integer>();
+    public static ArrayList<ArrayList<String>> featurePossVals = new ArrayList<ArrayList<String>>();
     
     public static ArrayList<Example> readRecords(String FILE_PATH){
 		BufferedReader reader = null;
@@ -44,6 +46,11 @@ public class DataLoader {
         	   if(labels.size()<numberOfFeatures)
         		   labels.add(currLable);
            }
+           int cnt = 0;
+           while(cnt < numberOfFeatures){
+        	   featurePossVals.add(new ArrayList<String>());
+        	   cnt++;
+           }
            
            //Read all records
            while ((line = reader.readLine()) != null) {
@@ -54,7 +61,13 @@ public class DataLoader {
             	   //Find all categorical features
             	   if(Integer.parseInt(currFeature)>1 && !catFeatures.contains(i))
             		   catFeatures.add(i);
-            	   ex.features.add(currFeature);
+            	   
+            	   if(!featurePossVals.get(i).contains(currFeature)){
+            		   featurePossVals.get(i).add(currFeature);
+            	   }
+            	   	
+            	   	   
+              	   ex.features.add(currFeature);
                }
                records.add(ex);
            }
