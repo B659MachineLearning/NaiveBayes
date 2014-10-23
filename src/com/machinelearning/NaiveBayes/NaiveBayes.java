@@ -1,10 +1,18 @@
 package com.machinelearning.NaiveBayes;
 
+/*
+ * Authors : Aniket Bhosale and Mayur Tare
+ * Description : This class implements Naive Bayes algorithm with Laplace correction.
+ */
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class NaiveBayes {
 	public static ArrayList<Double> weights;
+	//Assume class label "1" to be true and rest to be false
+	public static String trueClassLable = "1";
+	
 	
 	public static void main(String[] args) {
 		
@@ -15,7 +23,6 @@ public class NaiveBayes {
 		//Read Training Examples from Dataset file
 		ArrayList<Example> examples = DataLoader.readRecords(trainFilePath);
 		System.out.println("Examples =" + examples.size());
-		System.out.println("Features : "+DataLoader.featurePossVals);
 		
 		//Data Structure to store the counts for features
 		HashMap<Integer, HashMap<String, Integer>> trueCounts = new HashMap<Integer, HashMap<String, Integer>>();
@@ -24,9 +31,6 @@ public class NaiveBayes {
 		//Index of the class label
 		String lable = Config.readConfig("classLable");
 		int lableIndex = DataLoader.labels.indexOf(lable);
-		
-		//Assume class label "1" to be true and rest to be false
-		String trueClassLable = "1";
 		
 		int trueLableExamples = 0;
 		String currVal = null;
@@ -82,9 +86,7 @@ public class NaiveBayes {
 		
 		//Possible class lables
 		int possClassLables = 2;
-		
-		//System.out.println("True HashMap : "+trueCounts.toString());
-		//System.out.println("False HashMap : "+falseCounts.toString());
+
 		
 		//Classify the test data
 		//Read Test examples from Test Dataset
@@ -107,42 +109,40 @@ public class NaiveBayes {
 				int numberOfPossVals = DataLoader.featurePossVals.get(i).size();
 				if(i != lableIndex){
 					//for unseen values of features in train data assigning count = 0
-					int featureTrueCount = trueCounts.get(i).get(featureVal) != null ? trueCounts.get(i).get(featureVal) : 0;
-					int featureFalseCount = falseCounts.get(i).get(featureVal) != null ? falseCounts.get(i).get(featureVal) : 0;
+					int featureTrueCount = 0;
+					int featureFalseCount = 0;
+					if(trueCounts != null && trueCounts.get(i) != null)
+						featureTrueCount = trueCounts.get(i).get(featureVal) != null ? trueCounts.get(i).get(featureVal) : 0;
+					if(falseCounts != null && falseCounts.get(i) != null)	
+						featureFalseCount = falseCounts.get(i).get(featureVal) != null ? falseCounts.get(i).get(featureVal) : 0;
 					
 					trueProb *= (double)(featureTrueCount + laplaceCorrection)/(trueLableExamples + numberOfPossVals);
-					//System.out.println("FFFFFF : "+i+" "+testEx.getFeature(i));
 					falseProb *= (double)(featureFalseCount + laplaceCorrection)/(falseLableExamples + numberOfPossVals);
 					
-					System.out.println("true prob for feature "+DataLoader.labels.get(i)+"  : "+trueProb);
-					System.out.println("false prob for feature "+DataLoader.labels.get(i)+" : "+falseProb);
-					System.out.println("--------------------------------------");
 				}
 			}
-			//System.out.println("true prob : "+trueProb);
-			//System.out.println("false prob : "+falseProb);
-			
-			//System.out.println("=========================");
-			
+						
 			double normTrueProb = trueProb / (trueProb + falseProb);
 			double normFalseProb = falseProb / (trueProb + falseProb);
 			
 			String prediction = normTrueProb >= normFalseProb ? "T" : "F";
 			
-			if(observedLable.equalsIgnoreCase("1")){
+			//Check if prediction is correct or not
+			if(observedLable.equalsIgnoreCase(trueClassLable)){
 				if(!prediction.equalsIgnoreCase("T")){
 					wrongPredctionCount++;
-					System.out.println("Wrong prediction for Test Example : "+testEx.features.toString());
+					System.out.println("Wrong prediction for Test Example : "+testEx.features.toString()+" Predicted "+prediction);
 				}
 			}
 			else{
 				if(prediction.equalsIgnoreCase("T")){
 					wrongPredctionCount++;
-					System.out.println("Wrong prediction for Test Example : "+testEx.features.toString());
+					System.out.println("Wrong prediction for Test Example : "+testEx.features.toString()+" Predicted "+prediction);
 				}
 			}
 		}
 		
+		//Print the report of the classification
 		System.out.println(wrongPredctionCount+" Incorrect Predictions for "+testExamples.size()+" test examples");
 	}
 
