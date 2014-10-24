@@ -94,6 +94,7 @@ public class NaiveBayes {
 		System.out.println("Test Examples =" + testExamples.size());
 		
 		int wrongPredctionCount = 0;
+		int correctPredctionCount = 0;
 		int laplaceCorrection = 1;
 		
 		for(Example testEx : testExamples){
@@ -128,22 +129,21 @@ public class NaiveBayes {
 			String prediction = normTrueProb >= normFalseProb ? "T" : "F";
 			
 			//Check if prediction is correct or not
-			if(observedLable.equalsIgnoreCase(trueClassLable)){
-				if(!prediction.equalsIgnoreCase("T")){
-					wrongPredctionCount++;
-					System.out.println("Wrong prediction for Test Example : "+testEx.features.toString()+" Predicted "+prediction);
-				}
+			if(observedLable.equalsIgnoreCase(trueClassLable) && !prediction.equalsIgnoreCase("T")){
+				wrongPredctionCount++;
+			}
+			else if(!observedLable.equalsIgnoreCase(trueClassLable) && prediction.equalsIgnoreCase("T")){
+				wrongPredctionCount++;				
 			}
 			else{
-				if(prediction.equalsIgnoreCase("T")){
-					wrongPredctionCount++;
-					System.out.println("Wrong prediction for Test Example : "+testEx.features.toString()+" Predicted "+prediction);
-				}
+				correctPredctionCount++;
 			}
 		}
 		
 		//Print the report of the classification
+		System.out.println(correctPredctionCount+" Correct Predictions for "+testExamples.size()+" test examples");
 		System.out.println(wrongPredctionCount+" Incorrect Predictions for "+testExamples.size()+" test examples");
+		
 	}
 
 }
